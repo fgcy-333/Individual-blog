@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fgcy.mapper.TagMapper">
+    <resultMap id="BaseResultMap" type="com.fgcy.pojo.Tag">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, name,count
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_tag
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete
+        from t_tag
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.fgcy.pojo.Tag">
+        insert into t_tag (id, name)
+        values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.fgcy.pojo.Tag">
+        insert into t_tag
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+    <!--    增加标签数量-->
+    <!--        void addTagCount(@Param("asList")List<Long> asList);-->
+    <update id="addTagCount">
+        update t_tag set count=count+1
+        where
+        <if test="asList!=null and asList.size()>0">
+            id in
+            <foreach collection="asList" open="(" close=")" separator="," item="id">
+                #{id}
+            </foreach>
+        </if>
+        <if test="asList==null or !asList.size()>0">
+            1!=1
+        </if>
+
+    </update>
+
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.fgcy.pojo.Tag">
+        update t_tag
+        <set>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.fgcy.pojo.Tag">
+        update t_tag
+        set name = #{name,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+
+    <!--    减少标签数量-->
+    <update id="reduceTagCount">
+        update t_tag set count=count-1
+        where
+        <if test="asList!=null and asList.size()>0">
+            id in
+            <foreach collection="asList" open="(" close=")" separator="," item="id">
+                #{id}
+            </foreach>
+        </if>
+        <if test="asList==null or !asList.size()>0">
+            1!=1
+        </if>
+    </update>
+
+
+    <select id="findTagsByIds" resultType="tag">
+        select
+        <include refid="Base_Column_List"/>
+        from t_tag where id in
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            ${ids}
+        </trim>
+    </select>
+
+    <select id="getTagsByIds" resultType="tag">
+        select
+        <include refid="Base_Column_List"/>
+        from t_tag where
+        <if test="list !=null and list.size()>0">
+            id in
+            <foreach collection="list" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+
+        <if test="list ==null or !list.size()>0">
+            1!=1
+        </if>
+    </select>
+
+</mapper>

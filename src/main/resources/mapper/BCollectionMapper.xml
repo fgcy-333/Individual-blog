@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fgcy.mapper.BCollectionMapper">
+
+
+    <sql id="Base_Column_List">
+        id, user_id, blog_id, post_user_id, created, modified
+    </sql>
+
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete
+        from m_user_collection
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <!--根据用户id查询用户收藏-->
+    <select id="getCollectionByUserId" resultType="com.fgcy.pojo.BCollection">
+        SELECT b.id,
+               b.title,
+               c.modified as updateTime,
+               b.flag
+        FROM t_blog AS b
+                 LEFT JOIN m_user_collection AS c
+                           ON b.id = c.blog_id
+        where c.user_id = #{userId}
+          and b.status = 0
+          and c.status = 0
+    </select>
+
+
+    <insert id="insert" parameterType="com.fgcy.pojo.BCollection">
+        insert into m_user_collection (id, user_id, blog_id,
+                                       post_user_id, created, modified)
+        values (#{id,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, #{blogId,jdbcType=BIGINT},
+                #{postUserId,jdbcType=BIGINT}, #{created,jdbcType=TIMESTAMP}, #{modified,jdbcType=TIMESTAMP})
+    </insert>
+    <insert id="insertSelective" parameterType="com.fgcy.pojo.BCollection">
+        insert into m_user_collection
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="blogId != null">
+                blog_id,
+            </if>
+            <if test="postUserId != null">
+                post_user_id,
+            </if>
+            <if test="created != null">
+                created,
+            </if>
+            <if test="modified != null">
+                modified,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=BIGINT},
+            </if>
+            <if test="blogId != null">
+                #{blogId,jdbcType=BIGINT},
+            </if>
+            <if test="postUserId != null">
+                #{postUserId,jdbcType=BIGINT},
+            </if>
+            <if test="created != null">
+                #{created,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modified != null">
+                #{modified,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.fgcy.pojo.BCollection">
+        update m_user_collection
+        <set>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=BIGINT},
+            </if>
+            <if test="blogId != null">
+                blog_id = #{blogId,jdbcType=BIGINT},
+            </if>
+            <if test="postUserId != null">
+                post_user_id = #{postUserId,jdbcType=BIGINT},
+            </if>
+            <if test="created != null">
+                created = #{created,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modified != null">
+                modified = #{modified,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+
+    <update id="updateByPrimaryKey" parameterType="com.fgcy.pojo.BCollection">
+        update m_user_collection
+        set user_id      = #{userId,jdbcType=BIGINT},
+            blog_id      = #{blogId,jdbcType=BIGINT},
+            post_user_id = #{postUserId,jdbcType=BIGINT},
+            created      = #{created,jdbcType=TIMESTAMP},
+            modified     = #{modified,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+
+</mapper>

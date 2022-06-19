@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:replace="admin/_fragments :: head(~{::title})">
+    <title>fgcy个人博客注册页</title>
+</head>
+<body>
+
+
+<!--导航-->
+<nav th:replace="_fragments :: menu(1)" class="ui inverted attached segment m-padded-tb-mini m-shadow-small">
+
+</nav>
+<br>
+<br>
+<br>
+<div class="m-container-small m-padded-tb-massive" style="max-width: 30em !important;">
+    <div class="ur container">
+        <div class="ui middle aligned center aligned grid">
+            <div class="column">
+                <h2 class="ui teal image header">
+                    <div class="content">
+                        用户注册
+                    </div>
+                </h2>
+                <form class="ui large form" method="post" action="#" th:action="@{/register}">
+                    <div class="ui  segment">
+                        <div class="field">
+                            <div class="ui left icon input">
+                                <i class="user icon"></i>
+                                <input type="text" name="username" placeholder="用户名" id="registername">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="ui left icon input">
+                                <i class="lock icon"></i>
+                                <input type="password" name="password" placeholder="密码">
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <div class="ui left icon input">
+                                <input id="hiddenId" type="hidden" name="imgId"/>
+                                <input type="text" name="code" placeholder="请输入验证码" style="width: 40%" id="inputcode">
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <div class="ui left icon input">
+                                <img id="codeImg"/>
+                            </div>
+                        </div>
+                        <button class="ui fluid large teal submit button">注册</button>
+                    </div>
+
+                    <div class="ui error mini message"></div>
+
+
+                    <div class="ui mini negative message" th:unless="${#strings.isEmpty(message)}" th:text="${message}">
+                        提示信息
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--/*/<th:block th:replace="_fragments :: script">/*/-->
+
+<!--/*/</th:block>/*/-->
+
+<script type="text/javascript" th:inline="javascript">
+
+    $(document).ready(function () {
+        //点击图片刷新验证码
+        $('#codeImg').click(function () {
+            let imgId = rnd(1, 109876);
+            localStorage.imgId = imgId;
+            let url = /*[[@{/createCode}]]*/'';
+            url += "?codeId=" + imgId;
+            $('#codeImg').attr('src', url);
+        })
+    });
+
+    //验证是否重名
+    $('#registername').blur(function () {
+        var name = $('#registername').val();
+        console.log(name);
+        if (name != null && name != '') {
+            checkName(name);
+        }
+    });
+
+    //提供imgId
+    $('#inputcode').blur(function () {
+        console.log('设置imgId')
+        $('#hiddenId').attr('value', localStorage.imgId);
+    });
+
+
+    //发ajax请求到后台判断用户名是否重复
+    function checkName(name) {
+        $.ajax({
+            url: /*[[@{/validateName}]]*/'',
+            type: 'post',
+            dataType: 'JSON',
+            data: {
+                'username': name
+            },
+
+            success: function (result) {//已经存在该名字提示用户
+
+                if (result == false) {
+                    alert("该用户名已经存在");
+                    $('#registername').val('');
+                    $('#registername').focus();
+
+                } else {
+                    let imgId = rnd(1, 109876);
+                    localStorage.imgId = imgId;
+                    let url = /*[[@{/createCode}]]*/'';
+                    url += "?codeId=" + imgId;
+                    $('#codeImg').attr('src', url);
+                }
+
+            },
+            error:
+                function () {
+                    alert('检查用户是否存在发生错误');
+                }
+        });
+    }
+
+    function rnd(n, m) {
+        return Math.floor(Math.random() * (m - n + 1) + n)
+    }
+
+    $('.ui.form').form({
+        fields: {
+            username: {
+                identifier: 'username',
+                rules: [{
+                    type: 'empty',
+                    prompt: '请输入用户名'
+                }]
+            },
+            password: {
+                identifier: 'password',
+                rules: [{
+                    type: 'empty',
+                    prompt: '请输入密码'
+                }]
+            }
+        }
+    });
+
+</script>
+
+
+</body>
+</html>

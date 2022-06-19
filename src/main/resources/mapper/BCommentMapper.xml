@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fgcy.mapper.BCommentMapper">
+
+    <resultMap id="BaseResultMap" type="com.fgcy.pojo.BComment">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="parent_id" jdbcType="BIGINT" property="parentId"/>
+        <result column="blog_id" jdbcType="BIGINT" property="blogId"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="created" jdbcType="TIMESTAMP" property="created"/>
+    </resultMap>
+
+    <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.fgcy.pojo.BComment">
+        <result column="content" jdbcType="LONGVARCHAR" property="content"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, parent_id, blog_id, user_id, status, created,content
+    </sql>
+
+
+    <select id="getCommentsByDate" resultType="com.fgcy.pojo.BComment">
+        select
+        <include refid="Base_Column_List"/>
+        from m_comment
+        where created >= #{date}
+    </select>
+
+
+    <resultMap id="ExtendComment" type="extendComment">
+        <id property="id" column="id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="blogId" column="blog_id"/>
+        <association property="user" javaType="user" select="com.fgcy.mapper.UserMapper.getbaseUserByUserId"
+                     column="user_id"/>
+    </resultMap>
+
+    <!--获取某篇博客的所有评论-->
+    <select id="selectCommentByBlogId" resultMap="ExtendComment">
+        select
+        <include refid="Base_Column_List"/>
+        from m_comment where blog_id=#{blogId}
+        order by created desc
+    </select>
+
+    <!--    根据评论id获取用户id-->
+    <select id="getUserIdByCommentId" resultType="java.lang.Long">
+        select user_id
+        from m_comment
+        where id = #{id}
+          and status = 0
+    </select>
+
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete
+        from m_comment
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <insert id="insert" parameterType="com.fgcy.pojo.BComment">
+        insert into m_comment (id, parent_id, blog_id,
+                               user_id, status, created,
+                               content)
+        values (#{id,jdbcType=BIGINT}, #{parentId,jdbcType=BIGINT}, #{blogId,jdbcType=BIGINT},
+                #{userId,jdbcType=BIGINT}, #{status,jdbcType=TINYINT}, #{created,jdbcType=TIMESTAMP},
+                #{content,jdbcType=LONGVARCHAR})
+    </insert>
+
+    <insert id="insertSelective" parameterType="com.fgcy.pojo.BComment">
+        insert into m_comment
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="parentId != null">
+                parent_id,
+            </if>
+            <if test="blogId != null">
+                blog_id,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="created != null">
+                created,
+            </if>
+            <if test="content != null">
+                content,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="parentId != null">
+                #{parentId,jdbcType=BIGINT},
+            </if>
+            <if test="blogId != null">
+                #{blogId,jdbcType=BIGINT},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=BIGINT},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=TINYINT},
+            </if>
+            <if test="created != null">
+                #{created,jdbcType=TIMESTAMP},
+            </if>
+            <if test="content != null">
+                #{content,jdbcType=LONGVARCHAR},
+            </if>
+        </trim>
+
+    </insert>
+    <insert id="addComment" parameterType="extendComment">
+
+        insert into m_comment
+
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+
+            <if test="parentId != null">
+                parent_id,
+            </if>
+
+            <if test="blogId != null">
+                blog_id,
+            </if>
+
+            <if test="userId != null">
+                user_id,
+            </if>
+
+            <if test="status != null">
+                status,
+            </if>
+
+            <if test="created != null">
+                created,
+            </if>
+
+            <if test="content != null">
+                content,
+            </if>
+
+        </trim>
+
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="parentId != null">
+                #{parentId,jdbcType=BIGINT},
+            </if>
+            <if test="blogId != null">
+                #{blogId,jdbcType=BIGINT},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=BIGINT},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=TINYINT},
+            </if>
+            <if test="created != null">
+                #{created,jdbcType=TIMESTAMP},
+            </if>
+            <if test="content != null">
+                #{content,jdbcType=LONGVARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.fgcy.pojo.BComment">
+        update m_comment
+        <set>
+            <if test="parentId != null">
+                parent_id = #{parentId,jdbcType=BIGINT},
+            </if>
+            <if test="blogId != null">
+                blog_id = #{blogId,jdbcType=BIGINT},
+            </if>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=BIGINT},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=TINYINT},
+            </if>
+            <if test="created != null">
+                created = #{created,jdbcType=TIMESTAMP},
+            </if>
+            <if test="content != null">
+                content = #{content,jdbcType=LONGVARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.fgcy.pojo.BComment">
+        update m_comment
+        set parent_id = #{parentId,jdbcType=BIGINT},
+            blog_id   = #{blogId,jdbcType=BIGINT},
+            user_id   = #{userId,jdbcType=BIGINT},
+            status    = #{status,jdbcType=TINYINT},
+            created   = #{created,jdbcType=TIMESTAMP},
+            content   = #{content,jdbcType=LONGVARCHAR}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="com.fgcy.pojo.BComment">
+        update m_comment
+        set parent_id = #{parentId,jdbcType=BIGINT},
+            blog_id   = #{blogId,jdbcType=BIGINT},
+            user_id   = #{userId,jdbcType=BIGINT},
+            status    = #{status,jdbcType=TINYINT},
+            created   = #{created,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+
+</mapper>

@@ -1,0 +1,605 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fgcy.mapper.BlogMapper">
+
+    <resultMap id="BaseResultMap" type="com.fgcy.pojo.Blog">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="first_picture" jdbcType="VARCHAR" property="firstPicture"/>
+        <result column="flag" jdbcType="VARCHAR" property="flag"/>
+        <result column="view" jdbcType="INTEGER" property="view"/>
+        <result column="share_statement" jdbcType="BIT" property="shareStatement"/>
+        <result column="appreciation" jdbcType="BIT" property="appreciation"/>
+        <result column="publiced" jdbcType="BIT" property="publiced"/>
+        <result column="commentabled" jdbcType="BIT" property="commentabled"/>
+        <result column="recommend" jdbcType="BIT" property="recommend"/>
+        <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate"/>
+        <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="type_id" jdbcType="INTEGER" property="typeId"/>
+    </resultMap>
+    <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.fgcy.pojo.Blog">
+        <result column="content" jdbcType="LONGVARCHAR" property="content"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, title,content, first_picture, flag, view, share_statement, appreciation, publiced, commentabled,
+        recommend, gmt_create, gmt_modified, user_id, type_id,description,tag_ids,comment_count,collect_count,status
+    </sql>
+
+
+    <sql id="Blob_Column_List">
+        content
+    </sql>
+
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+
+        from t_blog
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete
+        from t_blog
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+
+
+    <!--    删除博肯关联的标签【中间表】-->
+    <!--    void deleteBlogTagByTagIds(@Param("oldTags") List<Integer> oldTags, @Param("blogId") Long blogId);-->
+    <delete id="deleteBlogTagByTagIds">
+
+        <foreach collection="oldTags" item="id" separator=";">
+            delete
+            from t_blog_tag
+            where tag_id = #{id}
+            and blog_id=#{blogId}
+        </foreach>
+
+
+    </delete>
+
+    <!--    逻辑删除博客-->
+    <update id="deleteBlogByBlogId">
+        update t_blog
+        set status=1
+        where id = #{blogId}
+    </update>
+
+
+    <insert id="insert" parameterType="com.fgcy.pojo.Blog">
+        insert into t_blog (id, title, first_picture,
+                            flag, view, share_statement,
+                            appreciation, publiced, commentabled,
+                            recommend, gmt_create, gmt_modified,
+                            user_id, type_id, content)
+        values (#{id,jdbcType=BIGINT}, #{title,jdbcType=VARCHAR}, #{firstPicture,jdbcType=VARCHAR},
+                #{flag,jdbcType=VARCHAR}, #{view,jdbcType=INTEGER}, #{shareStatement,jdbcType=BIT},
+                #{appreciation,jdbcType=BIT}, #{publiced,jdbcType=BIT}, #{commentabled,jdbcType=BIT},
+                #{recommend,jdbcType=BIT}, #{gmtCreate,jdbcType=TIMESTAMP}, #{gmtModified,jdbcType=TIMESTAMP},
+                #{userId,jdbcType=INTEGER}, #{typeId,jdbcType=INTEGER}, #{content,jdbcType=LONGVARCHAR})
+    </insert>
+
+
+    <!--    添加博客   选择性新增，主键回填-->
+    <insert id="insertSelective" parameterType="com.fgcy.pojo.Blog">
+        <selectKey resultType="long" keyProperty="id" order="AFTER">
+            select last_insert_id()
+        </selectKey>
+        insert into t_blog
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+
+            <if test="title != null">
+                title,
+            </if>
+
+            <if test="firstPicture != null">
+                first_picture,
+            </if>
+
+            <if test="flag != null">
+                flag,
+            </if>
+
+            <if test="view != null">
+                view,
+            </if>
+
+            <if test="shareStatement != null">
+                share_statement,
+            </if>
+
+            <if test="appreciation != null">
+                appreciation,
+            </if>
+
+
+            <if test="publiced != null">
+                publiced,
+            </if>
+
+            <if test="commentabled != null">
+                commentabled,
+            </if>
+
+            <if test="recommend != null">
+                recommend,
+            </if>
+
+            <if test="gmtCreate != null">
+                gmt_create,
+            </if>
+
+            <if test="gmtModified != null">
+                gmt_modified,
+            </if>
+
+            <if test="userId != null">
+                user_id,
+            </if>
+
+            <if test="typeId != null">
+                type_id,
+            </if>
+
+            <if test="content != null">
+                content,
+            </if>
+
+            <if test="description!=null and description!=''">
+                description,
+            </if>
+
+            <if test="tagIds!=null and tagIds!=''">
+                tag_ids,
+            </if>
+
+            <if test="commentCount!=null">
+                comment_count,
+            </if>
+
+            <if test="collectCount!=null">
+                collect_count,
+            </if>
+
+            <if test="status!=null">
+                status,
+            </if>
+        </trim>
+
+
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="title != null">
+                #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="firstPicture != null">
+                #{firstPicture,jdbcType=VARCHAR},
+            </if>
+            <if test="flag != null">
+                #{flag,jdbcType=VARCHAR},
+            </if>
+            <if test="view != null">
+                #{view,jdbcType=INTEGER},
+            </if>
+            <if test="shareStatement != null">
+                #{shareStatement,jdbcType=BIT},
+            </if>
+            <if test="appreciation != null">
+                #{appreciation,jdbcType=BIT},
+            </if>
+            <if test="publiced != null">
+                #{publiced,jdbcType=BIT},
+            </if>
+            <if test="commentabled != null">
+                #{commentabled,jdbcType=BIT},
+            </if>
+            <if test="recommend != null">
+                #{recommend,jdbcType=BIT},
+            </if>
+            <if test="gmtCreate != null">
+                #{gmtCreate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="gmtModified != null">
+                #{gmtModified,jdbcType=TIMESTAMP},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="typeId != null">
+                #{typeId,jdbcType=INTEGER},
+            </if>
+            <if test="content != null">
+                #{content,jdbcType=LONGVARCHAR},
+            </if>
+
+            <if test="description!=null and description!=''">
+                #{description},
+            </if>
+
+            <if test="tagIds!=null and tagIds!=''">
+                #{tagIds},
+            </if>
+
+            <if test="commentCount!=null">
+                #{commentCount},
+            </if>
+
+            <if test="collectCount!=null">
+                #{collectCount},
+            </if>
+
+            <if test="status!=null">
+                #{status},
+            </if>
+
+        </trim>
+
+    </insert>
+
+
+    <!--
+    选择性更新
+    -->
+    <update id="updateByPrimaryKeySelective" parameterType="com.fgcy.pojo.Blog">
+        update t_blog
+        <set>
+            <if test="title != null">
+                title = #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="firstPicture != null">
+                first_picture = #{firstPicture,jdbcType=VARCHAR},
+            </if>
+            <if test="flag != null">
+                flag = #{flag,jdbcType=VARCHAR},
+            </if>
+            <if test="view != null">
+                view = #{view,jdbcType=INTEGER},
+            </if>
+            <if test="shareStatement != null">
+                share_statement = #{shareStatement,jdbcType=BIT},
+            </if>
+            <if test="appreciation != null">
+                appreciation = #{appreciation,jdbcType=BIT},
+            </if>
+            <if test="publiced != null">
+                publiced = #{publiced,jdbcType=BIT},
+            </if>
+            <if test="commentabled != null">
+                commentabled = #{commentabled,jdbcType=BIT},
+            </if>
+            <if test="recommend != null">
+                recommend = #{recommend,jdbcType=BIT},
+            </if>
+            <if test="gmtCreate != null">
+                gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="gmtModified != null">
+                gmt_modified = #{gmtModified,jdbcType=TIMESTAMP},
+            </if>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="typeId != null">
+                type_id = #{typeId,jdbcType=INTEGER},
+            </if>
+            <if test="content != null">
+                content = #{content,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="description != null">
+                description = #{description},
+            </if>
+            <if test="tagIds != null">
+                tag_ids = #{tagIds},
+            </if>
+
+            <if test="commentCount != null">
+                comment_count = #{commentCount},
+            </if>
+
+            <if test="collectCount != null">
+                collect_count = #{collectCount},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+
+    <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.fgcy.pojo.Blog">
+        update t_blog
+        set title           = #{title,jdbcType=VARCHAR},
+            first_picture   = #{firstPicture,jdbcType=VARCHAR},
+            flag            = #{flag,jdbcType=VARCHAR},
+            view            = #{view,jdbcType=INTEGER},
+            share_statement = #{shareStatement,jdbcType=BIT},
+            appreciation    = #{appreciation,jdbcType=BIT},
+            publiced        = #{publiced,jdbcType=BIT},
+            commentabled    = #{commentabled,jdbcType=BIT},
+            recommend       = #{recommend,jdbcType=BIT},
+            gmt_create      = #{gmtCreate,jdbcType=TIMESTAMP},
+            gmt_modified    = #{gmtModified,jdbcType=TIMESTAMP},
+            user_id         = #{userId,jdbcType=INTEGER},
+            type_id         = #{typeId,jdbcType=INTEGER},
+            content         = #{content,jdbcType=LONGVARCHAR},
+            description=#{description},
+            tag_ids=#{tagIds}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+
+    <update id="updateByPrimaryKey" parameterType="com.fgcy.pojo.Blog">
+        update t_blog
+        set title           = #{title,jdbcType=VARCHAR},
+            first_picture   = #{firstPicture,jdbcType=VARCHAR},
+            flag            = #{flag,jdbcType=VARCHAR},
+            view            = #{view,jdbcType=INTEGER},
+            share_statement = #{shareStatement,jdbcType=BIT},
+            appreciation    = #{appreciation,jdbcType=BIT},
+            publiced        = #{publiced,jdbcType=BIT},
+            commentabled    = #{commentabled,jdbcType=BIT},
+            recommend       = #{recommend,jdbcType=BIT},
+            gmt_create      = #{gmtCreate,jdbcType=TIMESTAMP},
+            gmt_modified    = #{gmtModified,jdbcType=TIMESTAMP},
+            user_id         = #{userId,jdbcType=INTEGER},
+            type_id         = #{typeId,jdbcType=INTEGER}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+
+    <!--    改变用户收藏状态-->
+    <update id="updateUserCollectionStatus">
+        UPDATE m_user_collection
+        SET `status`=#{status}
+        where id = #{collectionId}
+    </update>
+
+
+    <!--定时器更新博客 全部数量-->
+    <update id="updateBlogCount">
+        update t_blog
+        set view=#{view},
+            comment_count=#{commentabled},
+            collect_count=#{collectCount}
+        where id = #{id}
+    </update>
+
+
+    <!--    根据条件查询 extendBlog-->
+    <select id="getBlogByCondition" resultType="blog" resultMap="updateBlogInfo">
+        select
+        <include refid="Base_Column_List"/>
+        from t_blog
+        <where>
+            status=0
+
+            <if test="id!=null">
+                and id=#{id}
+            </if>
+            <if test="title!=null and title!=''">
+                and title like concat('%',#{title},'%')
+            </if>
+            <if test="flag!=null and flag!=''">
+                and flag like concat('%',#{flag},'%')
+            </if>
+            <if test="view!=null">
+                and view=#{view}
+            </if>
+            <if test="shareStatement!=null">
+                and share_statement=#{shareStatement}
+            </if>
+            <if test="appreciation!=null">
+                and appreciation=#{appreciation}
+            </if>
+            <if test="publiced!=null">
+                and publiced=#{publiced}
+            </if>
+            <if test="commentabled!=null">
+                and commentabled=#{commentabled}
+            </if>
+            <if test="recommend!=null">
+                and recommend=#{recommend}
+            </if>
+            <if test="gmtCreate!=null">
+                and gmt_create=#{gmtCreate}
+            </if>
+            <if test="gmtModified!=null">
+                and gmt_modified=#{gmtModified}
+            </if>
+            <if test="userId!=null">
+                and user_id=#{userId}
+            </if>
+            <if test="typeId!=null">
+                and type_id=#{typeId}
+            </if>
+            <if test="content!=null and content!=''">
+                and content like concat('%',#{content},'%')
+            </if>
+
+        </where>
+    </select>
+
+
+    <!--博客标签表添加  【中间表】-->
+    <insert id="addBlogTags">
+        insert into t_blog_tag (tag_id,blog_id)
+        values
+        <foreach collection="tags" separator="," item="tag">
+            (#{tag},#{blogId})
+        </foreach>
+    </insert>
+
+
+    <insert id="addUserCollection">
+        insert into m_user_collection
+            (user_id, blog_id, post_user_id, created, modified, status)
+        values (#{userId}, #{blogId}, #{postUserId}, #{created}, #{modified}, #{status})
+    </insert>
+
+
+    <!--    首页数据 排序-->
+    <select id="getExtendBlogOrderByCondition" resultMap="updateBlogInfo">
+        select
+        <include refid="Base_Column_List"/>
+        from t_blog
+        where status=0
+        <if test="#{condition}!=null">
+            order by ${condition}
+        </if>
+    </select>
+
+
+    <select id="getBlogsBySize" resultType="long">
+        select
+        id
+        from t_blog
+        where status=0
+        <if test="condition!=null and condition!=''">
+            order by ${condition}
+        </if>
+        <if test="size!=null">
+            limit ${size}
+        </if>
+    </select>
+
+
+    <select id="queryByTitleOrContentAndDescription" resultMap="updateBlogInfo">
+        select
+        <include refid="Base_Column_List"/>
+        from t_blog
+        where description like concat('%',#{query},'%') or
+        title like concat('%',#{query},'%')
+        and status=0
+    </select>
+
+
+    <!--    根据博客id获取extendblog 用于....-->
+    <select id="getExtendBlogByBlogId" resultMap="updateBlogInfo">
+        select
+        <include refid="Base_Column_List"/>
+        from
+        t_blog
+        where id=#{id}
+        and status=0
+    </select>
+
+
+    <!--  根据typeId 获取全部博客-->
+    <select id="getBlogsByConditionId" resultMap="updateBlogInfo">
+        select
+        <include refid="Base_Column_List"/>
+        from
+        t_blog
+        <where>
+            <if test="typeId!=null">
+                type_id=#{typeId}
+            </if>
+            and status=0
+        </where>
+    </select>
+
+
+    <!--根据多个博客id获取博客 应用于根据某个标签获取全部博客-->
+    <select id="getBlogsByBlogIds" resultMap="updateBlogInfo">
+        select
+        <include refid="Base_Column_List"/>
+        from t_blog
+        <if test="blogIds!=null and blogIds.size()>0">
+            where status=0 and
+            id in
+            <foreach collection="blogIds" open="(" close=")" separator="," item="id">
+                #{id}
+            </foreach>
+        </if>
+        <if test="blogIds==null and !blogIds.size()>0">
+            1!=1
+        </if>
+    </select>
+
+
+    <!--获取全部博客  用于博客归档-->
+    <select id="getAllBlogs" resultType="blog">
+        select
+        <include refid="Base_Column_List"/>
+        from t_blog WHERE status=0
+    </select>
+
+
+    <!--博客表前部信息、标签表、类型表、部分用户信息-->
+    <resultMap id="updateBlogInfo" type="extendBlog">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="first_picture" jdbcType="VARCHAR" property="firstPicture"/>
+        <result column="flag" jdbcType="VARCHAR" property="flag"/>
+        <result column="view" jdbcType="INTEGER" property="view"/>
+        <result column="share_statement" jdbcType="BIT" property="shareStatement"/>
+        <result column="appreciation" jdbcType="BIT" property="appreciation"/>
+        <result column="publiced" jdbcType="BIT" property="publiced"/>
+        <result column="commentabled" jdbcType="BIT" property="commentabled"/>
+        <result column="recommend" jdbcType="BIT" property="recommend"/>
+        <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate"/>
+        <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="type_id" jdbcType="INTEGER" property="typeId"/>
+        <result column="description" property="description"/>
+        <result column="tag_ids" property="tagIds"/>
+        <association property="user" javaType="user" column="user_id"
+                     select="com.fgcy.mapper.UserMapper.getBaseUserByUserId"/>
+        <association property="type" column="type_id" javaType="type" select="com.fgcy.mapper.TypeMapper.findTypeById"/>
+        <collection property="tags" ofType="tag" column="tag_ids" select="com.fgcy.mapper.TagMapper.findTagsByIds"/>
+    </resultMap>
+
+
+    <select id="getUpdateBlogInfoByBlogId" resultMap="updateBlogInfo">
+        select
+        <include refid="Base_Column_List"/>
+        from t_blog
+        where id=#{blogId}
+        and status=0
+    </select>
+
+
+    <!--    根据博客id获取标签id类型id-->
+    <select id="getBaseBlogForDelete" resultType="com.fgcy.pojo.Blog">
+        select id, tag_ids, type_id
+        from t_blog
+        where id = #{id}
+    </select>
+
+
+    <!--    是否收藏-->
+    <!--        int checkIsCollectionBlog(@Param("userId") Long userId, @Param("blogId") Long blogId);-->
+    <select id="checkIsCollectionBlog" resultType="long">
+        select id
+        from m_user_collection
+        where user_id = #{userId}
+          and blog_id = #{blogId}
+          and status = 0
+    </select>
+
+    <select id="getUserCollectionStatus" resultType="com.fgcy.pojo.MUserCollection">
+        select id, status
+        from m_user_collection
+        where user_id = #{userId}
+          and blog_id = #{blogId}
+    </select>
+
+
+    <select id="getUserIdByBlogId" resultType="java.lang.Long">
+        select user_id
+        from t_blog
+        where id = #{id}
+    </select>
+
+
+</mapper>

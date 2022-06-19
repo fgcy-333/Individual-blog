@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width"/>
+    <title>fgcy个人博客欢迎页面</title>
+
+    <link rel="shortcut icon" th:href="@{/favicon.ico}"/>
+    <link rel="bookmark" th:href="@{/favicon.ico}"/>
+    <link rel="stylesheet" th:href="@{/css/semantic.min.css}">
+    <link href="layui/css/layui.css" rel="stylesheet" type="text/css" th:href="@{/css/layui.css}">
+    <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css"
+          th:href="@{/css/font-awesome.min.css}">
+
+    <link href="css/index_style.css" rel="stylesheet" type="text/css" th:href="@{/css/index_style.css}">
+    <link href="css/animate.min.css" rel="stylesheet" type="text/css" th:href="@{/css/animate.min.css}">
+</head>
+<body>
+<div id="menu" class="hover_animation menu_open" data-mark="false">
+    <span></span>
+    <span></span>
+    <span></span>
+</div>
+<div id="navgation" class="navgation navgation_close">
+    <ul class="point">
+        <li><a th:href="@{/blog}">start</a></li>
+        <li><a th:href="@{/user/login}">login</a></li>
+        <li><a th:href="@{/admin/blogs}">admin</a></li>
+    </ul>
+    <div class="logo"><a>Mr.fgcy</a></div>
+</div>
+<div class="section" id="section1">
+    <div class="fp-tablecell">
+        <div class="page1">
+            <div class="nav wow zoomIn" data-wow-duration="2s">
+                <h1>欢迎进入fgcy的个人博客</h1>
+                <p>愿你有进一步的勇气,也有退一步的从容</p>
+
+                <a class="layui-btn layui-btn-primary layui-border-black" style="margin-top: 20px" th:href="@{/blog}">Enter
+                    Blog</a>
+            </div>
+            <a class="next wow fadeInUp" data-wow-duration="2s" id="next"></a>
+        </div>
+    </div>
+</div>
+<div class="section" id="section2">
+    <div class="fp-tablecell">
+        <div class="page2">
+            <div class="warp-box">
+                <div class="new-article">
+                    <div class="inner wow fadeInDown" data-wow-delay=".2s">
+                        <h1>博客归档</h1>
+                        <p>
+                            此去星辰大海
+                            <br>归来仍是少年
+                        </p>
+                    </div>
+                </div>
+
+
+                <div th:each="item : ${archiveMap}">
+
+                    <h1 style="margin-top:40px;margin-bottom:50px;">
+
+                        <i class="fa fa-clock-o"></i>
+                        <span th:text="${item.key}">
+                    </span></h1>
+                    <div th:each="blog : ${item.value}">
+                        <ul class="layui-timeline">
+
+                            <li class="layui-timeline-item">
+                                <i class="layui-icon layui-timeline-axis">&#xe63f;</i>
+                                <div class="layui-timeline-content layui-text">
+                                    <h3 class="layui-timeline-title"
+                                        th:text="${#dates.format(blog.gmtModified,'MMMdd')}+'日'">
+                                        8月18日
+                                    </h3>
+
+                                    <a th:text="${blog.title}" th:href="@{/blog/{id}(id=${blog.id})}"
+                                       class="layui-btn layui-btn-primary layui-border-black"
+                                       style="width: 100%;border-color:#5fb878;border-top: none;border-left: none;border-right: none"></a>
+
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+
+                </ul>
+            </div>
+
+
+            <div class="doc-container" id="doc-container">
+                <div class="container-fixed">
+                    <div class="timeline-box shadow">
+                        <div class="timeline-main">
+                            <h1 style="margin-top: 50px"><i class="fa fa-hourglass-end"></i><span
+                                    style="margin-left: 6px">THE END</span></h1>
+                            <div class="timeline-line"></div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+</div>
+</div>
+<div class="section" id="section3">
+    <div class="fp-tablecell">
+        <div class="page3">
+            <div class="warp-box">
+                <div class="warp">
+                    <div class="inner">
+                        <div class="links">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="section" id="section4">
+    <div class="fp-tablecell">
+        <div class="page4">
+            <div class="warp-box">
+                <div class="about">
+                    <div class="inner">
+                        <h1 class="wow fadeInLeft">风格差异的个人博客</h1>
+                        <p class="wow fadeInRight">
+                            一天很短，开心了就笑，不开心了就过会儿再笑。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="layui/layui.js" th:src="@{/js/lay/modules/jquery.js}"></script>
+<script src="layui/layui.js" th:src="@{/js/layui.js}"></script>
+<script src="js/wow.min.js" th:src="@{/js/wow.min.js}"></script>
+<script src="js/index.js" th:src="@{/js/index.js}"></script>
+</body>
+</html>

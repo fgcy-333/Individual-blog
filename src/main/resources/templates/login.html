@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:replace="admin/_fragments :: head(~{::title})">
+    <title>fgcy个人博客登录页</title>
+</head>
+<body>
+
+
+<!--导航-->
+<nav th:replace="_fragments :: menu(4)" class="ui inverted attached segment m-padded-tb-mini m-shadow-small">
+
+</nav>
+<br>
+<br>
+<br>
+<div class="m-container-small m-padded-tb-massive" style="max-width: 30em !important;">
+    <div class="ur container">
+        <div class="ui middle aligned center aligned grid">
+            <div class="column">
+                <h2 class="ui teal image header">
+                    用户登录
+                    <div class="content">
+                    </div>
+                </h2>
+                <form class="ui large form" method="post" action="#" th:action="@{/user/login}">
+                    <div class="ui  segment">
+                        <div class="field">
+                            <div class="ui left icon input">
+                                <i class="user icon"></i>
+                                <input type="text" name="username" placeholder="用户名">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="ui left icon input">
+                                <i class="lock icon"></i>
+                                <input type="password" name="password" placeholder="密码">
+                            </div>
+                        </div>
+                        <button class="ui fluid large teal submit button">登 录</button>
+                        <a class="fluid ui button" style="margin-top: 4px" id="registerbtn">注 册
+                        </a>
+                    </div>
+
+                    <div class="ui error mini message"></div>
+
+
+                    <div class="ui mini negative message" th:unless="${#strings.isEmpty(message)}" th:text="${message}">
+                        用户名和密码错误
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--/*/<th:block th:replace="_fragments :: script">/*/-->
+
+<!--/*/</th:block>/*/-->
+
+<script type="text/javascript" th:inline="javascript">
+
+    /*    $(document).ready(function () {
+
+        });*/
+    $('#registerbtn').click(function () {
+       window.location.href=/*[[@{/register}]]*/''
+    });
+
+
+    $('.ui.form').form({
+        fields: {
+            username: {
+                identifier: 'username',
+                rules: [{
+                    type: 'empty',
+                    prompt: '请输入用户名'
+                }]
+            },
+            password: {
+                identifier: 'password',
+                rules: [{
+                    type: 'empty',
+                    prompt: '请输入密码'
+                }]
+            }
+        }
+    });
+
+    if ([[${logout}]] == "logout" && [[${mmm}]] != '') {
+        localStorage.userid = '';
+        localStorage.avartar = '';
+        localStorage.username = '';
+        localStorage.token = '';
+    }
+
+    if ([[${token}]] != null && [[${token}]] != '') {
+        localStorage.token = [[${token}]]
+        if ([[${user?.id}]] != null) {
+            localStorage.userid = [[${user?.id}]];
+            localStorage.avartar = [[${user?.avatar}]];
+            localStorage.username = [[${user?.username}]];
+        }
+        window.location.href =/*[[@{/blog}]]*/''
+    }
+</script>
+
+
+</body>
+</html>
